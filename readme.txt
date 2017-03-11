@@ -10,9 +10,10 @@
   - BeautifulSoup 3.2.1 (http://www.crummy.com/software/BeautifulSoup/)
   - socksipy-branch 1.02+ (https://socksipy-branch.googlecode.com/)
   - Pillow (https://python-pillow.github.io/)
-  - imageio (https://github.com/3d0c/imagio)
+  - imageio (https://imageio.github.io/)
   - numpy (https://github.com/numpy/numpy)
   - freeimage-3.15.4-win32.dll (https://github.com/imageio/imageio-binaries/tree/master/freeimage)
+  - win_unicode_console 0.5 (https://github.com/Drekin/win-unicode-console) Windows Only
 
 ================================================================================
 = Capabilities:                                                                =
@@ -94,6 +95,16 @@ A.Usage:
 	command to delete it.
       - If you are downloading using Download from List.txt (3), you can create
 	ignore_list.txt to skip the member id.
+  Q6. The app doesn't download all the images!
+      - Check your pixiv website settings (refer to https://goo.gl/gQi09v), 
+        then delete the cookie value in config.ini and retry.
+      - Check the value of r18mode in config.ini. Setting it to True will only 
+        download R-18 images.        
+  Q7. The apps show square/question mark texts in the console output!
+      - This is because your windows is not to Japanese for the Regional Settings 
+        in control panel.
+      - Since 20161114+ version, you need to set the console font properties to
+        use font with unicode support (e.g. Arial Unicode, MS Gothic). 
 
 B.Bugs/Source Code/Supports:
   Q1. Where I can report for bugs?
@@ -134,15 +145,15 @@ Q3: Error at process_image(): (<type 'exceptions.AttributeError'>,
     AttributeError ("'NoneType' object has no attribute 'find'",)
     - Usually this is because of login failed (cookie not valid). Try to change
       your password to simple one for testing, or copy the cookie from browser:
-      1. Open Firefox.
-      2. Login to your pixiv, remember to enable [Remember Me] check box.
-      3. Right click the page and select View Page Info.
-      4. Click the Security tab.
+      1. Open Firefox/Chrome.
+      2. Login to your pixiv.
+      3. Right click the page and select View Page Info -> Security tab (Firefox), or
+         Right click on the leftmost address bar/the (i) icon (Chrome)
       5. Click the View Cookies button.
       6. Look for Cookie named = PHPSESSID.
       7. Copy the content value.
       8. Open config.ini, go to [Authentication] section, paste the value to
-         cookie, set 'keepsignedin = 1'.
+         cookie.
     - Or because pixiv have changed the layout code, so the pixiv
       downloader cannot parse the page correctly. Please tell me by put a
       comment if this happen and include the details, such as the member/image
@@ -175,7 +186,7 @@ Q6: httperror_seek_wrapper: HTTP Error 403: request disallowed by robots.txt
                             (required: [y/n] for wildcard, start page, end page,
                              followed by tags)
                         4 - Download from list
-                            (optional: followed by path to list)
+                            (optional: followed by path to list and optional tag)
                         5 - Download from user bookmark
                             (optional: followed by [y/n] for private bookmark)
                         6 - Download from image bookmark
@@ -296,43 +307,15 @@ uselist       ==> set to 'True' to parse list.txt.
                   and custom folder).
 daylastupdated ==> Only process member_id which x days from the last check.
 processfromdb  ==> Set 'True' to use the member_id from the DB.
-filenameformat
-==> The format for the filename, reserved/illegal character will be replaced
-    with underscore '_', repeated space will be trimmed to single space.
-    The filename (+full path) will be trimmed to the first 250 character
-    (Windows limitation).
-    -> %member_token%    ==> member token, doesn't change.
-    -> %member_id%       ==> member id, in number.
-    -> %image_id%        ==> image id, in number.
-    -> %title%           ==> image title, usually in japanese character.
-    -> %tags%            ==> image tags, usually in japanese character.
-    -> %artist%          ==> artist name, may change.
-    -> %works_date%      ==> works date, complete with time.
-    -> %works_date_only% ==> only the works date.
-    -> %works_res%       ==> image resolution, will be containing the page
-                              count if manga.
-    -> %works_tools%  ==> tools used for the image.
-    -> %R-18%         ==> Append R-18/R-18 based on image tag, can be used
-                              for creating directory by appending directory
-                              separator, e.g.: %R-18%\%image_id%.
-    -> %urlFilename%  ==> the actual filename stored in server without
-                              the file extensions.
-    -> %page_big%     ==> for manga mode, add big in the filename.
-    -> %page_index%   ==> for manga mode, add page number with 0-index.
-    -> %page_number%  ==> for manga mode, add page number with 1-index.
-    -> %bookmark%     ==> for bookmark mode, add 'Bookmarks' string.
-    -> %original_member_id%    ==> for bookmark mode, put original member id.
-    -> %original_member_token% ==> for bookmark mode, put original member token.
-    -> %original_artist%       ==> for bookmark mode, put original artist name.
-    -> %searchTags%   ==> for download by tags, put searched tags.
-    -> %date%         ==> current date in YYYYMMMDD format.
-    -> %bookmark_count% ==> Bookmark count, will have overhead except on
-                            download by tags.
-    -> %image_response_count%  ==> Image respose count, will have overhead
-			                       except on download by tags.
-    -> %works_date_fmt{<format>}% ==> works date using custom format.
-                                      Use Python string format notation, refer: https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior
-                                      e.g. %works_date_fmt{%Y-%m-%d}%
+filenameformat ==> The format for the filename, reserved/illegal character 
+                   will be replaced with underscore '_', repeated space will 
+				   be trimmed to single space.
+                   The filename (+full path) will be trimmed to the first 250 
+				   character (Windows limitation).
+				   Refer to Filename Format Syntax for available format.
+filenamemangaformat ==> Similar like filename format, but for manga pages.
+avatarNameFormat ==> Similar like filename format, but for avatar image.
+                     Not all format available.
 tagsseparator  ==> Separator for each tag in filename, put %space% for space.
 overwrite      ==> Overwrite old files, set 'False' to disable.
 downloadlistdirectory ==> list.txt path.
@@ -363,9 +346,9 @@ tagsLimit	==> Number of tags to be used for %tags% meta in filename.
 		    Use -1 to use all tags.
 writeimageinfo  ==> set to 'True' to export the image information to text file.
                     The filename is following the image filename + .txt.
-dateDiff        ==> Gets only pictures that were posted X days before the system
-                    date. Set 0 to disable. Skip to next member id if in Download
-                    by Member, stop processing if in Download New Illust.
+dateDiff        ==> Process only new images within the given date difference. 
+                    Set 0 to disable. Skip to next member id if in 'Download
+                    by Member', stop processing if in 'Download New Illust' mode.
 backupOldFile   ==> Set to True to backup old file if the file size is different.
                     Old filename will be renamed to filename.unix-time.extension.
 writeugoirainfo ==> If set to True, it will dump the .js to external file.
@@ -388,15 +371,78 @@ urlDumpFilename       ==> Define the dump filename, use python strftime() format
 dbPath		==> use different database.
 creategif       ==> Set to True to convert ugoira file to gif.
                     Required createUgoira = True.
-tempfolder      ==> Temporary folder used for converting ugoira to gif.
-                    Doesn't support unicode due to library limitation.
+createapng      ==> Set to True to convert ugoira file to animated png.
+                    Required createUgoira = True.
+					The generated png is not optimized due to library limitation.
 useBlacklistMembers ==> Skip image by member id.
                         Please create 'blacklist_members.txt' in the same folder
                         of the application.
 
-=================================================================================
-= list.txt Format                                                               =
-=================================================================================
+===============================================================================
+= Filename Format Syntax                                                      =
+===============================================================================
+Available for filenameFormat, filenameMangaFormat, and avatarNameFormat:
+-> %member_token%
+   Member token, doesn't change.
+-> %member_id%
+   Member id, in number.
+-> %artist%
+   Artist name, may change.
+-> %urlFilename%
+   The actual filename stored in server without the file extensions.   
+-> %date%
+   Current date in YYYYMMMDD format.
+-> %date_fmt{format}% 
+   Current date using custom format.
+   Use Python string format notation, refer: https://goo.gl/3UiMAb
+   e.g. %date_fmt{%Y-%m-%d}%
+   
+Available for filenameFormat and filenameMangaFormat:
+-> %image_id%
+   Image id, in number.
+-> %title%
+   Image title, usually in japanese character.
+-> %tags%
+   Image tags, usually in japanese character.
+-> %works_date%
+   Works date, complete with time.
+-> %works_date_only%
+   Only the works date.
+-> %works_date_fmt{<format>}%
+   works date using custom format.
+   Use Python string format notation, refer: https://goo.gl/3UiMAb
+   e.g. %works_date_fmt{%Y-%m-%d}%
+-> %works_res%
+   Image resolution, will be containing the page count if manga.
+-> %works_tools% 
+   Tools used for the image.
+-> %R-18%
+   Append R-18/R-18 based on image tag, can be used for creating directory 
+   by appending directory separator, e.g.: %R-18%\%image_id%.
+-> %page_big%
+   for manga mode, add big in the filename.
+-> %page_index%
+   for manga mode, add page number with 0-index.
+-> %page_number%
+   for manga mode, add page number with 1-index.
+-> %bookmark%
+   for bookmark mode, add 'Bookmarks' string.
+-> %original_member_id%
+   for bookmark mode, put original member id.
+-> %original_member_token%
+   for bookmark mode, put original member token.
+-> %original_artist%
+   for bookmark mode, put original artist name.
+-> %searchTags%
+   for download by tags, put searched tags.
+-> %bookmark_count%
+   Bookmark count, will have overhead except on download by tags.
+-> %image_response_count%
+   Image respose count, will have overhead except on download by tags.
+
+===============================================================================
+= list.txt Format                                                             =
+===============================================================================
 - This file should be build in the following way, white space will be trimmed,
   see example:
 

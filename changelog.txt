@@ -1,3 +1,45 @@
+20170220:
+- Update test cases.
+- Fix Issue #178: Unbound variable upon error handling.
+- Fix Issue #192: Syntax error :P.	
+- Fix Issue #195: Update imageio library url.
+- Fix Issue #196: Allow any whitespace after memberid in list.txt
+- Fix Issue #200: Update tag parsing.
+
+20170131:
+- Fix code to enable dumping medium page by configuration.
+- Try to Fix Issue #182: Handle missing stats on Japanese UI.
+- Implement #184: Always send charset header value as utf-8.
+- Fix Issue #191: handle custom directory in list.txt
+
+20161231
+- Fix Issue #181: Login using password.
+
+20161207
+- Fix download by list.txt and tags for oldui.
+
+20161205
+- Implement #149: APNG generation. Set createApng = True in config.ini to enable.
+- Implement #172: Modify option 4 to allow download by member id list and tag.
+- Implement #174: Allow custom avatar name format, refer to readme.txt for available format. Set blank to use default behaviour.
+- implement #177: Allow custom current date format, refer to readme.txt for formating syntax.
+
+20161124
+- Fix Issue #173: Option 11 for oldui and whitecube.
+- Update ugoira support for whitecube.
+- Update option 10 support for whitecube.
+
+20161113b
+- Fix Issue #168: Fix referer for avatar image download.
+- Implement whitecube search tag mode.
+- Fix Issue #170: fix PixivHelper import.
+- Add call to use win_unicode_console, you need to set unicode-supported font in the windows console properties.
+- fix folder.jpg filename generator.
+
+20161012
+- Fix Issue #152: fix UnboundLocalError for image_id.
+- Implement #145: enable ideographic space (\u3000) in tag separator, use %ideo_space% in config.ini.
+
 20160927
 - Fix Issue #147: update parser to handle invalid member id.
 
